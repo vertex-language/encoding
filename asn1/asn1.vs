@@ -79,6 +79,12 @@ public struct Reader {
     public var Remaining: int { return r.Remaining }
     public var AtEnd: bool { return r.AtEnd }
 
+    /// RawContents returns the unread bytes of this reader (e.g. the whole
+    /// contents of a value obtained via Expect), consuming them.
+    public mutating func RawContents() -> [uint8] {
+        return r.Rest()
+    }
+
     /// PeekTag returns the next identifier octet without consuming it.
     public func PeekTag() throws -> uint8 {
         do {
