@@ -17,7 +17,7 @@ All packages in this repository are organized as directory packages (`encoding/<
 - **`encoding/base64`**: RFC 4648 Base64 encoding and decoding (`base64.StdEncoding`, `base64.URLEncoding`).
 - **`encoding/pem`**: Privacy-Enhanced Mail (PEM) block parsing and encoding (`pem.Decode`, `pem.Encode`).
 - **`encoding/asn1`**: ASN.1 DER data structures for X.509 certificates and keys.
-- **`encoding/json`**: JSON parsing and document serialization.
+- **`encoding/json`**: JSON (RFC 8259) parsed into a `json.Value` document and written back (`json.Parse`, `json.Encode`). Numbers keep their text, so 64-bit integers are exact; objects keep their key order.
 
 ---
 
@@ -85,6 +85,7 @@ vsc run tests/binary/main.vs
 vsc run tests/hex/main.vs
 vsc run tests/base64/main.vs
 vsc run tests/pem/main.vs
+vsc run tests/json/main.vs
 ```
 
 ---
