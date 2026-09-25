@@ -1,16 +1,16 @@
 # encoding
 
-[![package: stdlib](https://img.shields.io/badge/package-stdlib-f4f4f5?style=flat-square&labelColor=e4e4e7&color=18181b)](https://github.com/vertex-language)
-[![encoding: pure-buffers](https://img.shields.io/badge/encoding-pure--buffers-f4f4f5?style=flat-square&labelColor=e4e4e7&color=18181b)](https://github.com/vertex-language/encoding)
+[![package: vs-package](https://img.shields.io/badge/package-vs--package-f4f4f5?style=flat-square&labelColor=e4e4e7&color=18181b)](https://github.com/vertex-language)
+[![encoding: binary | text](https://img.shields.io/badge/encoding-binary%20%7C%20text-f4f4f5?style=flat-square&labelColor=e4e4e7&color=18181b)](https://github.com/vertex-language/encoding)
 [![runtime: zero-copy](https://img.shields.io/badge/runtime-zero--copy-f4f4f5?style=flat-square&labelColor=e4e4e7&color=18181b)](https://github.com/vertex-language)
 
-Standard data encoding and decoding library for the Vertex programming language, providing pure in-memory transformations for wire protocols, cryptographic armor, and binary serialization.
+Data encoding and decoding library providing in-memory transformations for wire protocols, cryptographic armor, and binary serialization.
 
 ---
 
 ## Packages
 
-All packages in this domain repository use Golang-style directory packages (`encoding/<pkg>`) compiled directly from pure Vertex sources:
+All packages in this repository are organized as directory packages (`encoding/<pkg>`):
 
 - **`encoding/binary`**: Big-endian and little-endian number serialization and byte manipulation (`binary.BigEndian`, `binary.LittleEndian`).
 - **`encoding/hex`**: Hexadecimal encoding and decoding (`hex.EncodeToString`, `hex.DecodeString`).
@@ -22,6 +22,12 @@ All packages in this domain repository use Golang-style directory packages (`enc
 ---
 
 ## Quick Start
+
+Run any entry point with:
+
+```bash
+vsc run main.vs
+```
 
 ### Binary Wire Encoding
 
@@ -72,13 +78,13 @@ Run the test suite across all encoding packages:
 
 ```bash
 # Run all encoding tests
-vsc run -replace encoding=. tests/all/main.vs
+vsc run tests/all/main.vs
 
 # Run individual package test suites
-vsc run -replace encoding=. tests/binary/main.vs
-vsc run -replace encoding=. tests/hex/main.vs
-vsc run -replace encoding=. tests/base64/main.vs
-vsc run -replace encoding=. tests/pem/main.vs
+vsc run tests/binary/main.vs
+vsc run tests/hex/main.vs
+vsc run tests/base64/main.vs
+vsc run tests/pem/main.vs
 ```
 
 ---
