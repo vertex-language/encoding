@@ -23,10 +23,16 @@ All packages in this repository are organized as directory packages (`encoding/<
 
 ## Quick Start
 
-Run any entry point with:
+Run the test suite or any tool in `cmd/` with `vsc run`:
 
 ```bash
-vsc run main.vs
+# Run all encoding tests
+vsc run check
+
+# Run individual package test suites
+vsc run test-json
+vsc run test-base64
+vsc run test-hex
 ```
 
 ### Binary Wire Encoding
@@ -52,8 +58,10 @@ func main() -> int32 {
 ```swift
 package main
 
-import "encoding/pem"
-import "encoding/hex"
+import (
+    "encoding/hex"
+    "encoding/pem"
+)
 
 func main() -> int32 {
     let rawPem = """

@@ -1,9 +1,11 @@
 package main
 
-import "encoding/binary"
-import "encoding/hex"
-import "encoding/base64"
-import "encoding/pem"
+import (
+    "encoding/base64"
+    "encoding/binary"
+    "encoding/hex"
+    "encoding/pem"
+)
 
 var failures = 0
 
