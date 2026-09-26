@@ -78,14 +78,14 @@ Run the test suite across all encoding packages:
 
 ```bash
 # Run all encoding tests
-vsc run tests/all/main.vs
+vsc run check
 
 # Run individual package test suites
-vsc run tests/binary/main.vs
-vsc run tests/hex/main.vs
-vsc run tests/base64/main.vs
-vsc run tests/pem/main.vs
-vsc run tests/json/main.vs
+vsc run test-binary
+vsc run test-hex
+vsc run test-base64
+vsc run test-pem
+vsc run test-json
 ```
 
 ---
