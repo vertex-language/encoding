@@ -1,5 +1,7 @@
 package binary
 
+import "unicode/utf16"
+
 /// BinaryError is what a Reader throws when a field runs past the bytes it
 /// was given. Nothing is read out of bounds: a short read throws instead.
 public enum BinaryError: Error {
@@ -275,82 +277,25 @@ public struct Writer {
 
 /// EncodeUTF16LE is the UTF-16LE encoding of s, without a terminator.
 public func EncodeUTF16LE(_ s: string) -> [uint8] {
-    let u = [uint8](s.utf8)
+    let units = utf16.Encode(s)
     var out: [uint8] = []
-
-    var i = 0
-    while i < u.count {
-        let b0 = uint32(u[i])
-        var cp: uint32 = 0xFFFD
-        if b0 < 0x80 {
-            cp = b0
-            i += 1
-        } else if b0 >= 0xC0 && b0 < 0xE0 && i + 1 < u.count {
-            cp = ((b0 & 0x1F) << 6) | (uint32(u[i + 1]) & 0x3F)
-            i += 2
-        } else if b0 >= 0xE0 && b0 < 0xF0 && i + 2 < u.count {
-            cp = ((b0 & 0x0F) << 12) | ((uint32(u[i + 1]) & 0x3F) << 6) | (uint32(u[i + 2]) & 0x3F)
-            i += 3
-        } else if b0 >= 0xF0 && i + 3 < u.count {
-            cp = ((b0 & 0x07) << 18) | ((uint32(u[i + 1]) & 0x3F) << 12) |
-                ((uint32(u[i + 2]) & 0x3F) << 6) | (uint32(u[i + 3]) & 0x3F)
-            i += 4
-        } else {
-            i += 1
-        }
-        if cp >= 0x10000 {
-            let v = cp - 0x10000
-            let hi = 0xD800 + (v >> 10)
-            let lo = 0xDC00 + (v & 0x3FF)
-            out.append(uint8(truncatingIfNeeded: hi))
-            out.append(uint8(truncatingIfNeeded: hi >> 8))
-            out.append(uint8(truncatingIfNeeded: lo))
-            out.append(uint8(truncatingIfNeeded: lo >> 8))
-        } else {
-            out.append(uint8(truncatingIfNeeded: cp))
-            out.append(uint8(truncatingIfNeeded: cp >> 8))
-        }
+    out.reserveCapacity(units.count * 2)
+    for u in units {
+        out.append(uint8(truncatingIfNeeded: u))
+        out.append(uint8(truncatingIfNeeded: u >> 8))
     }
     return out
 }
 
 /// DecodeUTF16LE decodes UTF-16LE bytes, stopping at the first NUL unit.
 public func DecodeUTF16LE(_ b: [uint8]) -> string {
-    var out: [uint8] = []
+    var units: [uint16] = []
     var i = 0
     while i + 1 < b.count {
-        var cp = uint32(b[i]) | (uint32(b[i + 1]) << 8)
+        let u = uint16(b[i]) | (uint16(b[i + 1]) << 8)
+        if u == 0 { break }
+        units.append(u)
         i += 2
-        if cp == 0 {
-            break
-        }
-        if cp >= 0xD800 && cp < 0xDC00 && i + 1 < b.count {
-            let lo = uint32(b[i]) | (uint32(b[i + 1]) << 8)
-            if lo >= 0xDC00 && lo < 0xE000 {
-                cp = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00)
-                i += 2
-            }
-        }
-        AppendUTF8(&out, cp)
     }
-    return string(decoding: out, as: UTF8.self)
-}
-
-/// AppendUTF8 appends the UTF-8 encoding of one code point.
-public func AppendUTF8(_ out: inout [uint8], _ cp: uint32) {
-    if cp < 0x80 {
-        out.append(uint8(cp))
-    } else if cp < 0x800 {
-        out.append(uint8(0xC0 | (cp >> 6)))
-        out.append(uint8(0x80 | (cp & 0x3F)))
-    } else if cp < 0x10000 {
-        out.append(uint8(0xE0 | (cp >> 12)))
-        out.append(uint8(0x80 | ((cp >> 6) & 0x3F)))
-        out.append(uint8(0x80 | (cp & 0x3F)))
-    } else {
-        out.append(uint8(0xF0 | (cp >> 18)))
-        out.append(uint8(0x80 | ((cp >> 12) & 0x3F)))
-        out.append(uint8(0x80 | ((cp >> 6) & 0x3F)))
-        out.append(uint8(0x80 | (cp & 0x3F)))
-    }
+    return utf16.Decode(units)
 }

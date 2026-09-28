@@ -1,5 +1,11 @@
 package json
 
+import (
+    "unicode"
+    "unicode/utf8"
+    "unicode/utf16"
+)
+
 /// ParseError says what was wrong and at which byte offset.
 public struct ParseError: Error, CustomStringConvertible {
     public let Message: string
@@ -240,26 +246,24 @@ struct parser {
             case 0x74: out.append(0x09)
             case 0x75: // u
                 var cp = try self.hex4()
-                if cp >= 0xD800 && cp < 0xDC00 {
+                if utf16.IsHighSurrogate(uint16(cp)) {
                     // A high surrogate pairs with the low one that follows;
                     // alone, it becomes U+FFFD.
+                    let high = uint16(cp)
+                    cp = unicode.ReplacementCharacter
                     if self.pos + 1 < self.buf.count && self.buf[self.pos] == 0x5C && self.buf[self.pos + 1] == 0x75 {
                         let save = self.pos
                         self.pos += 2
-                        let lo = try self.hex4()
-                        if lo >= 0xDC00 && lo < 0xE000 {
-                            cp = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00)
+                        let low = uint16(try self.hex4())
+                        if utf16.IsLowSurrogate(low) {
+                            cp = utf16.Combine(high, low)
                         } else {
                             self.pos = save
-                            cp = 0xFFFD
                         }
-                    } else {
-                        cp = 0xFFFD
                     }
-                } else if cp >= 0xDC00 && cp < 0xE000 {
-                    cp = 0xFFFD
                 }
-                appendUTF8(&out, cp)
+                // A lone low surrogate is written as U+FFFD too.
+                utf8.Append(&out, cp)
             default:
                 throw ParseError("invalid escape", at: self.pos - 2)
             }
@@ -290,23 +294,5 @@ struct parser {
         }
         self.pos += 4
         return v
-    }
-}
-
-func appendUTF8(_ out: inout [uint8], _ cp: uint32) {
-    if cp < 0x80 {
-        out.append(uint8(cp))
-    } else if cp < 0x800 {
-        out.append(uint8(0xC0 | (cp >> 6)))
-        out.append(uint8(0x80 | (cp & 0x3F)))
-    } else if cp < 0x10000 {
-        out.append(uint8(0xE0 | (cp >> 12)))
-        out.append(uint8(0x80 | ((cp >> 6) & 0x3F)))
-        out.append(uint8(0x80 | (cp & 0x3F)))
-    } else {
-        out.append(uint8(0xF0 | (cp >> 18)))
-        out.append(uint8(0x80 | ((cp >> 12) & 0x3F)))
-        out.append(uint8(0x80 | ((cp >> 6) & 0x3F)))
-        out.append(uint8(0x80 | (cp & 0x3F)))
     }
 }

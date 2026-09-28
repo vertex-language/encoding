@@ -18,6 +18,7 @@ All packages in this repository are organized as directory packages (`encoding/<
 - **`encoding/pem`**: Privacy-Enhanced Mail (PEM) block parsing and encoding (`pem.Decode`, `pem.Encode`).
 - **`encoding/asn1`**: ASN.1 DER data structures for X.509 certificates and keys.
 - **`encoding/json`**: JSON (RFC 8259) parsed into a `json.Value` document and written back (`json.Parse`, `json.Encode`). Numbers keep their text, so 64-bit integers are exact; objects keep their key order.
+- **`encoding/xml`**: XML 1.0 read as a token stream (`xml.Decoder`) or a tree (`xml.Parse`), checked for well-formedness, with namespaces resolved (`xml.Name{Space, Local}`, as in Go), names keeping their case, and a DOCTYPE's internal entities honoured. UTF-8 only.
 
 ---
 
@@ -31,6 +32,7 @@ vsc run check
 
 # Run individual package test suites
 vsc run test-json
+vsc run test-xml
 vsc run test-base64
 vsc run test-hex
 ```
