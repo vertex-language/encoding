@@ -4,7 +4,7 @@ import "encoding/xml"
 
 var failures = 0
 
-func check(_ ok: bool, _ msg: string) {
+func check(ok: bool, msg: string) {
     if ok {
         print("ok    \(msg)")
     } else {
@@ -14,7 +14,7 @@ func check(_ ok: bool, _ msg: string) {
 }
 
 /// The error a document fails with, or "" where it parses.
-func failure(_ text: string) -> string {
+func failure(text: string) -> string {
     do {
         _ = try xml.Parse(text)
         return ""

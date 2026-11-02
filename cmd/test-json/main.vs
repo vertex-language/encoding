@@ -4,7 +4,7 @@ import "encoding/json"
 
 var failures = 0
 
-func check(_ ok: bool, _ msg: string) {
+func check(ok: bool, msg: string) {
     if ok {
         print("ok    \(msg)")
     } else {
@@ -13,7 +13,7 @@ func check(_ ok: bool, _ msg: string) {
     }
 }
 
-func fails(_ text: string) -> bool {
+func fails(text: string) -> bool {
     do {
         _ = try json.Parse(text)
         return false

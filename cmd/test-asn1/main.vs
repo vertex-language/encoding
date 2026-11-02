@@ -3,10 +3,10 @@ package main
 import "encoding/asn1"
 
 var failures = 0
-func check(_ ok: bool, _ msg: string) {
+func check(ok: bool, msg: string) {
     if ok { print("ok    \(msg)") } else { print("FAIL  \(msg)"); failures += 1 }
 }
-func eq(_ a: [uint8], _ b: [uint8]) -> bool {
+func eq(a: [uint8], b: [uint8]) -> bool {
     if a.count != b.count { return false }
     var i = 0
     while i < a.count { if a[i] != b[i] { return false }; i += 1 }

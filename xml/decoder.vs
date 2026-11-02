@@ -27,13 +27,13 @@ public final class Decoder {
     /// The end an empty-element tag owes after its start.
     var pendingEnd: Name? = nil
 
-    public init(_ bytes: [uint8]) {
+    public init(bytes: [uint8]) {
         buf = bytes
         // A UTF-8 byte order mark is allowed, and isn't content.
         if buf.count >= 3 && buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF { pos = 3 }
     }
 
-    public convenience init(_ text: string) {
+    public convenience init(text: string) {
         self.init([uint8](text.utf8))
     }
 
@@ -346,7 +346,7 @@ public final class Decoder {
 
     // MARK: - Namespaces
 
-    func lookup(_ prefix: string) -> string? {
+    func lookup(prefix: string) -> string? {
         var i = scopes.count - 1
         while i >= 0 {
             if let uri = scopes[i][prefix] { return uri }
@@ -355,7 +355,7 @@ public final class Decoder {
         return nil
     }
 
-    func elementName(_ raw: string) throws -> Name {
+    func elementName(raw: string) throws -> Name {
         let (prefix, local) = split(raw)
         if prefix.isEmpty { return Name(local, space: lookup("") ?? "") }
         if prefix == "xml" { return Name(local, space: XMLNamespace) }
@@ -363,7 +363,7 @@ public final class Decoder {
         return Name(local, space: uri)
     }
 
-    func attributeName(_ raw: string) throws -> Name {
+    func attributeName(raw: string) throws -> Name {
         let (prefix, local) = split(raw)
         if prefix.isEmpty { return Name(local) }
         if prefix == "xmlns" { return Name(local, space: "xmlns") }
@@ -375,7 +375,7 @@ public final class Decoder {
     // MARK: - Declarations
 
     /// Rejects an encoding other than UTF-8 or ASCII, which this reads.
-    func checkEncoding(_ decl: string) throws {
+    func checkEncoding(decl: string) throws {
         let b = [uint8](decl.utf8)
         guard let at = find(b, "encoding", from: 0) else { return }
         var i = at + 8
@@ -390,7 +390,7 @@ public final class Decoder {
     /// Keeps <!ENTITY name "value"> declarations of an internal subset.
     /// Parameter entities (<!ENTITY % ...>) and external ones are passed
     /// over.
-    func declareEntities(_ body: string) {
+    func declareEntities(body: string) {
         let b = [uint8](body.utf8)
         var i = 0
         while let at = find(b, "<!ENTITY", from: i) {
@@ -409,7 +409,7 @@ public final class Decoder {
 
     // MARK: - Scanning
 
-    func has(_ s: string) -> bool {
+    func has(s: string) -> bool {
         var i = 0
         for c in s.utf8 {
             if pos + i >= buf.count || buf[pos + i] != c { return false }
@@ -426,7 +426,7 @@ public final class Decoder {
     }
 
     /// A SyntaxError at the current position.
-    func fail(_ message: string) -> SyntaxError {
+    func fail(message: string) -> SyntaxError {
         var line = 1
         var column = 1
         var i = 0
@@ -445,7 +445,7 @@ public final class Decoder {
 }
 
 /// Where s next appears in b at or after from.
-func find(_ b: [uint8], _ s: string, from: int) -> int? {
+func find(b: [uint8], s: string, from: int) -> int? {
     let needle = [uint8](s.utf8)
     var i = from
     while i + needle.count <= b.count {
@@ -459,7 +459,7 @@ func find(_ b: [uint8], _ s: string, from: int) -> int? {
 
 /// The string quoted at b[i], ' or ", with i moved past it; nil where no
 /// quote starts there or none ends it.
-func quoted(_ b: [uint8], _ i: inout int) -> string? {
+func quoted(b: [uint8], i: inout int) -> string? {
     if i >= b.count || (b[i] != 34 && b[i] != 39) { return nil }
     let q = b[i]
     let start = i + 1
@@ -470,24 +470,24 @@ func quoted(_ b: [uint8], _ i: inout int) -> string? {
     return String(decoding: b[start..<j], as: UTF8.self)
 }
 
-func split(_ raw: string) -> (string, string) {
+func split(raw: string) -> (string, string) {
     if let i = raw.firstIndex(of: ":") {
         return (String(raw[..<i]), String(raw[raw.index(after: i)...]))
     }
     return ("", raw)
 }
 
-func isSpace(_ c: uint8) -> bool {
+func isSpace(c: uint8) -> bool {
     return c == 32 || c == 9 || c == 10 || c == 13
 }
 
 /// XML's name characters, by byte: ASCII letters, '_' and ':' to start,
 /// digits, '-' and '.' after; every non-ASCII byte is taken as part of a
 /// name, which the letters of other scripts are.
-func isNameStart(_ c: uint8) -> bool {
+func isNameStart(c: uint8) -> bool {
     return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 || c == 58 || c >= 0x80
 }
 
-func isNameByte(_ c: uint8) -> bool {
+func isNameByte(c: uint8) -> bool {
     return isNameStart(c) || (c >= 48 && c <= 57) || c == 45 || c == 46
 }

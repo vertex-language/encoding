@@ -66,11 +66,11 @@ public enum Asn1Error: Error {
 public struct Reader {
     var r: binary.Reader
 
-    public init(_ data: [uint8]) {
+    public init(data: [uint8]) {
         self.r = binary.Reader(data)
     }
 
-    static func over(_ base: binary.Reader) -> Reader {
+    static func over(base: binary.Reader) -> Reader {
         var rd = Reader([])
         rd.r = base
         return rd
@@ -118,7 +118,7 @@ public struct Reader {
 
     /// Expect consumes a TLV whose identifier equals tag and returns a
     /// Reader over its contents.
-    public mutating func Expect(_ tag: uint8) throws -> Reader {
+    public mutating func Expect(tag: uint8) throws -> Reader {
         let tlv = try readTLV()
         if tlv.tag != tag {
             throw Asn1Error.unexpectedTag(want: tag, got: tlv.tag)
@@ -138,13 +138,13 @@ public struct Reader {
 
     /// TaggedContext consumes an explicit context-specific member [n] and
     /// returns a Reader over its (constructed) contents.
-    public mutating func TaggedContext(_ n: uint8) throws -> Reader {
+    public mutating func TaggedContext(n: uint8) throws -> Reader {
         return try Expect(Class.ContextSpecific | Constructed | n)
     }
 
     /// OptionalContext returns a Reader over member [n] if it is next, else
     /// nil, consuming nothing when absent.
-    public mutating func OptionalContext(_ n: uint8) throws -> Reader? {
+    public mutating func OptionalContext(n: uint8) throws -> Reader? {
         if r.AtEnd { return nil }
         let want = Class.ContextSpecific | Constructed | n
         let got = try PeekTag()
@@ -260,7 +260,7 @@ public struct Reader {
 }
 
 /// readLength reads a definite DER/BER length.
-func readLength(_ r: inout binary.Reader) throws -> int {
+func readLength(r: inout binary.Reader) throws -> int {
     let first: uint8
     do {
         first = try r.U8()
@@ -304,36 +304,36 @@ public struct Writer {
     public var Count: int { return Bytes.count }
 
     /// TLV appends one tag-length-value with the given contents.
-    public mutating func TLV(_ tag: uint8, _ contents: [uint8]) {
+    public mutating func TLV(tag: uint8, contents: [uint8]) {
         Bytes.append(tag)
         appendLength(&Bytes, contents.count)
         Bytes.append(contentsOf: contents)
     }
 
-    public mutating func Sequence(_ contents: [uint8]) {
+    public mutating func Sequence(contents: [uint8]) {
         TLV(Tag.Sequence | Constructed, contents)
     }
 
-    public mutating func Set(_ contents: [uint8]) {
+    public mutating func Set(contents: [uint8]) {
         TLV(Tag.Set | Constructed, contents)
     }
 
     /// ExplicitContext wraps contents in an explicit [n] tag.
-    public mutating func ExplicitContext(_ n: uint8, _ contents: [uint8]) {
+    public mutating func ExplicitContext(n: uint8, contents: [uint8]) {
         TLV(Class.ContextSpecific | Constructed | n, contents)
     }
 
-    public mutating func OctetString(_ v: [uint8]) {
+    public mutating func OctetString(v: [uint8]) {
         TLV(Tag.OctetString, v)
     }
 
-    public mutating func BitString(_ v: [uint8]) {
+    public mutating func BitString(v: [uint8]) {
         var c: [uint8] = [0]      // zero unused bits
         c.append(contentsOf: v)
         TLV(Tag.BitString, c)
     }
 
-    public mutating func Boolean(_ v: bool) {
+    public mutating func Boolean(v: bool) {
         TLV(Tag.Boolean, [v ? 0xFF : 0x00])
     }
 
@@ -342,13 +342,13 @@ public struct Writer {
     }
 
     /// Integer encodes a non-negative or negative 64-bit INTEGER minimally.
-    public mutating func Integer(_ v: int64) {
+    public mutating func Integer(v: int64) {
         TLV(Tag.Integer, encodeInteger(v))
     }
 
     /// BigIntegerUnsigned encodes a positive INTEGER from magnitude bytes,
     /// adding a leading zero when the top bit is set so it stays positive.
-    public mutating func BigIntegerUnsigned(_ magnitude: [uint8]) {
+    public mutating func BigIntegerUnsigned(magnitude: [uint8]) {
         var m = magnitude
         // Strip leading zeros (keep at least one byte).
         var start = 0
@@ -363,16 +363,16 @@ public struct Writer {
         TLV(Tag.Integer, c)
     }
 
-    public mutating func ObjectIdentifier(_ arcs: [uint64]) {
+    public mutating func ObjectIdentifier(arcs: [uint64]) {
         TLV(Tag.ObjectIdentifier, encodeOID(arcs))
     }
 
-    public mutating func Raw(_ der: [uint8]) {
+    public mutating func Raw(der: [uint8]) {
         Bytes.append(contentsOf: der)
     }
 }
 
-func appendLength(_ out: inout [uint8], _ length: int) {
+func appendLength(out: inout [uint8], length: int) {
     if length < 0x80 {
         out.append(uint8(length))
         return
@@ -392,7 +392,7 @@ func appendLength(_ out: inout [uint8], _ length: int) {
     }
 }
 
-func encodeInteger(_ v: int64) -> [uint8] {
+func encodeInteger(v: int64) -> [uint8] {
     if v == 0 { return [0] }
     var bytes: [uint8] = []
     var n = v
@@ -418,7 +418,7 @@ func encodeInteger(_ v: int64) -> [uint8] {
     return out
 }
 
-func encodeOID(_ arcs: [uint64]) -> [uint8] {
+func encodeOID(arcs: [uint64]) -> [uint8] {
     var out: [uint8] = []
     if arcs.count >= 2 {
         out.append(uint8(truncatingIfNeeded: arcs[0] * 40 + arcs[1]))
@@ -431,7 +431,7 @@ func encodeOID(_ arcs: [uint64]) -> [uint8] {
     return out
 }
 
-func appendBase128(_ out: inout [uint8], _ value: uint64) {
+func appendBase128(out: inout [uint8], value: uint64) {
     if value == 0 {
         out.append(0)
         return
@@ -452,7 +452,7 @@ func appendBase128(_ out: inout [uint8], _ value: uint64) {
 }
 
 /// OIDEqual compares two arc lists.
-public func OIDEqual(_ a: [uint64], _ b: [uint64]) -> bool {
+public func OIDEqual(a: [uint64], b: [uint64]) -> bool {
     if a.count != b.count { return false }
     var i = 0
     while i < a.count {

@@ -11,7 +11,7 @@ public struct ParseError: Error, CustomStringConvertible {
     public let Message: string
     public let Offset: int
 
-    public init(_ message: string, at offset: int) {
+    public init(message: string, at offset: int) {
         self.Message = message
         self.Offset = offset
     }
@@ -23,7 +23,7 @@ public struct ParseError: Error, CustomStringConvertible {
 
 /// Parse reads one JSON document from text. Whitespace may surround it;
 /// anything else after it is an error.
-public func Parse(_ text: string) throws -> Value {
+public func Parse(text: string) throws -> Value {
     return try Parse(bytes: [uint8](text.utf8))
 }
 
@@ -46,7 +46,7 @@ struct parser {
     let buf: [uint8]
     var pos: int = 0
 
-    init(_ buf: [uint8]) {
+    init(buf: [uint8]) {
         self.buf = buf
     }
 
@@ -92,7 +92,7 @@ struct parser {
         }
     }
 
-    mutating func literal(_ word: string) throws {
+    mutating func literal(word: string) throws {
         let start = self.pos
         for b in word.utf8 {
             if self.pos >= self.buf.count || self.buf[self.pos] != b {

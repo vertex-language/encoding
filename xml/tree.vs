@@ -16,13 +16,13 @@ public final class Element {
     public var Children: [Node] = []
     public weak var Parent: Element?
 
-    public init(_ name: Name, attributes: [Attr] = []) {
+    public init(name: Name, attributes: [Attr] = []) {
         self.Name = name
         self.Attributes = attributes
     }
 
     /// The value of the attribute with this local name and namespace.
-    public func Attribute(_ local: string, space: string = "") -> string? {
+    public func Attribute(local: string, space: string = "") -> string? {
         for a in Attributes where a.Name.Local == local && a.Name.Space == space {
             return a.Value
         }
@@ -45,7 +45,7 @@ public final class Element {
         return out
     }
 
-    func appendText(_ out: inout string) {
+    func appendText(out: inout string) {
         for c in Children {
             switch c {
             case .text(let t): out += t
@@ -57,13 +57,13 @@ public final class Element {
 
     /// Every element inside this one with this local name, in document
     /// order, whatever its namespace.
-    public func Descendants(_ local: string) -> [Element] {
+    public func Descendants(local: string) -> [Element] {
         var out: [Element] = []
         collect(local, &out)
         return out
     }
 
-    func collect(_ local: string, _ out: inout [Element]) {
+    func collect(local: string, out: inout [Element]) {
         for e in Elements {
             if e.Name.Local == local { out.append(e) }
             e.collect(local, &out)
@@ -79,7 +79,7 @@ public struct Document {
 }
 
 /// Parse reads a whole document into a tree.
-public func Parse(_ text: string) throws -> Document {
+public func Parse(text: string) throws -> Document {
     return try Parse(bytes: [uint8](text.utf8))
 }
 

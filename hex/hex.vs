@@ -11,7 +11,7 @@ let hexChars: [CChar] = [
     97, 98, 99, 100, 101, 102               // 'a'-'f'
 ]
 
-func decodeNibble(_ b: uint8) throws -> uint8 {
+func decodeNibble(b: uint8) throws -> uint8 {
     if b >= 48 && b <= 57 {
         return b - 48
     }
@@ -25,17 +25,17 @@ func decodeNibble(_ b: uint8) throws -> uint8 {
 }
 
 /// EncodedLen returns the length of an encoding of n source bytes.
-public func EncodedLen(_ n: int) -> int {
+public func EncodedLen(n: int) -> int {
     return n * 2
 }
 
 /// DecodedLen returns the length of a decoding of x source bytes.
-public func DecodedLen(_ x: int) -> int {
+public func DecodedLen(x: int) -> int {
     return x / 2
 }
 
 /// EncodeToString returns the hexadecimal encoding of src.
-public func EncodeToString(_ src: [uint8]) -> string {
+public func EncodeToString(src: [uint8]) -> string {
     var out: [CChar] = []
     var i = 0
     while i < src.count {
@@ -49,7 +49,7 @@ public func EncodeToString(_ src: [uint8]) -> string {
 }
 
 /// DecodeString returns the bytes represented by the hexadecimal string s.
-public func DecodeString(_ s: string) throws -> [uint8] {
+public func DecodeString(s: string) throws -> [uint8] {
     var src: [uint8] = []
     for b in s.utf8 {
         src.append(b)

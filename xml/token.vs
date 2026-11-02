@@ -7,7 +7,7 @@ public struct StartElement {
     public var Attributes: [Attr]
 
     /// The value of the attribute with this local name and namespace.
-    public func Attribute(_ local: string, space: string = "") -> string? {
+    public func Attribute(local: string, space: string = "") -> string? {
         for a in Attributes where a.Name.Local == local && a.Name.Space == space {
             return a.Value
         }

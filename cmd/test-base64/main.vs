@@ -4,7 +4,7 @@ import "encoding/base64"
 
 var failures = 0
 
-func check(_ ok: bool, _ msg: string) {
+func check(ok: bool, msg: string) {
     if ok {
         print("ok    \(msg)")
     } else {
@@ -13,13 +13,13 @@ func check(_ ok: bool, _ msg: string) {
     }
 }
 
-func bytesOf(_ s: string) -> [uint8] {
+func bytesOf(s: string) -> [uint8] {
     var out: [uint8] = []
     for b in s.utf8 { out.append(b) }
     return out
 }
 
-func stringOf(_ b: [uint8]) -> string {
+func stringOf(b: [uint8]) -> string {
     var chars: [CChar] = []
     for byte in b { chars.append(CChar(truncatingIfNeeded: byte)) }
     chars.append(0)

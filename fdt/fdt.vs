@@ -34,17 +34,17 @@ public final class Node {
         Name = name
     }
 
-    public func AddProperty(_ name: string, _ value: [uint8]) {
+    public func AddProperty(name: string, value: [uint8]) {
         Properties.append(Property(name: name, value: value))
     }
 
-    public func AddProperty(_ name: string, _ value: string) {
+    public func AddProperty(name: string, value: string) {
         var bytes = [uint8](value.utf8)
         bytes.append(0)
         AddProperty(name, bytes)
     }
 
-    public func AddProperty(_ name: string, strings: [string]) {
+    public func AddProperty(name: string, strings: [string]) {
         var bytes: [uint8] = []
         for s in strings {
             bytes.append(contentsOf: s.utf8)
@@ -53,19 +53,19 @@ public final class Node {
         AddProperty(name, bytes)
     }
 
-    public func AddProperty(_ name: string, _ value: uint32) {
+    public func AddProperty(name: string, value: uint32) {
         var bytes = [uint8](repeating: 0, count: 4)
         binary.BigEndian.PutUint32(&bytes, value, at: 0)
         AddProperty(name, bytes)
     }
 
-    public func AddProperty(_ name: string, _ value: uint64) {
+    public func AddProperty(name: string, value: uint64) {
         var bytes = [uint8](repeating: 0, count: 8)
         binary.BigEndian.PutUint64(&bytes, value, at: 0)
         AddProperty(name, bytes)
     }
 
-    public func AddProperty(_ name: string, u32s: [uint32]) {
+    public func AddProperty(name: string, u32s: [uint32]) {
         var bytes = [uint8](repeating: 0, count: u32s.count * 4)
         for i in 0..<u32s.count {
             binary.BigEndian.PutUint32(&bytes, u32s[i], at: i * 4)
@@ -73,7 +73,7 @@ public final class Node {
         AddProperty(name, bytes)
     }
 
-    public func AddProperty(_ name: string, u64s: [uint64]) {
+    public func AddProperty(name: string, u64s: [uint64]) {
         var bytes = [uint8](repeating: 0, count: u64s.count * 8)
         for i in 0..<u64s.count {
             binary.BigEndian.PutUint64(&bytes, u64s[i], at: i * 8)
@@ -81,31 +81,31 @@ public final class Node {
         AddProperty(name, bytes)
     }
 
-    public func AddEmptyProperty(_ name: string) {
+    public func AddEmptyProperty(name: string) {
         AddProperty(name, [])
     }
 
     @discardableResult
-    public func AddChild(_ child: Node) -> Node {
+    public func AddChild(child: Node) -> Node {
         Children.append(child)
         return child
     }
 
     @discardableResult
-    public func AddChild(_ name: string) -> Node {
+    public func AddChild(name: string) -> Node {
         let n = Node(name: name)
         Children.append(n)
         return n
     }
 
-    public func Child(_ name: string) -> Node? {
+    public func Child(name: string) -> Node? {
         for c in Children {
             if c.Name == name { return c }
         }
         return nil
     }
 
-    public func PropertyNamed(_ name: string) -> Property? {
+    public func PropertyNamed(name: string) -> Property? {
         for p in Properties {
             if p.Name == name { return p }
         }
@@ -154,7 +154,7 @@ public final class Tree {
 
         var structBytes: [uint8] = []
 
-        func writeNode(_ node: Node) {
+        func writeNode(node: Node) {
             writeToken(tokenBeginNode, into: &structBytes)
             var nameBytes = [uint8](node.Name.utf8)
             nameBytes.append(0)
@@ -239,7 +239,7 @@ public enum FdtError: Error, CustomStringConvertible {
 }
 
 /// Decodes binary DTB bytes into a Tree.
-public func Decode(_ bytes: [uint8]) throws -> Tree {
+public func Decode(bytes: [uint8]) throws -> Tree {
     if bytes.count < 40 {
         throw FdtError.truncated("header too small")
     }
@@ -344,29 +344,29 @@ public func Decode(_ bytes: [uint8]) throws -> Tree {
     return tree
 }
 
-func writeToken(_ tok: uint32, into: inout [uint8]) {
+func writeToken(tok: uint32, into: inout [uint8]) {
     writeU32(tok, into: &into)
 }
 
-func writeU32(_ v: uint32, into: inout [uint8]) {
+func writeU32(v: uint32, into: inout [uint8]) {
     binary.BigEndian.AppendUint32(&into, v)
 }
 
-func align4(_ b: inout [uint8]) {
+func align4(b: inout [uint8]) {
     while b.count % 4 != 0 {
         b.append(0)
     }
 }
 
-func alignUp(_ val: uint32, _ align: uint32) -> uint32 {
+func alignUp(val: uint32, align: uint32) -> uint32 {
     (val + align - 1) / align * align
 }
 
-func alignUp(_ val: int, _ align: int) -> int {
+func alignUp(val: int, align: int) -> int {
     (val + align - 1) / align * align
 }
 
-func copyInto(_ dst: inout [uint8], at offset: int, from src: [uint8]) {
+func copyInto(dst: inout [uint8], at offset: int, from src: [uint8]) {
     var i = 0
     while i < src.count && offset + i < dst.count {
         dst[offset + i] = src[i]

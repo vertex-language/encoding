@@ -16,7 +16,7 @@ public struct SyntaxError: Error, CustomStringConvertible {
     public let Line: int
     public let Column: int
 
-    public init(_ message: string, line: int, column: int) {
+    public init(message: string, line: int, column: int) {
         self.Message = message
         self.Line = line
         self.Column = column

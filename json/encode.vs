@@ -2,20 +2,20 @@ package json
 
 /// Encode writes v as JSON text. With an indent ("  ", "\t") each member
 /// and element goes on its own line; without one the text is compact.
-public func Encode(_ v: Value, indent: string = "") -> string {
+public func Encode(v: Value, indent: string = "") -> string {
     var out: [uint8] = []
     write(v, &out, [uint8](indent.utf8), 0)
     return String(decoding: out, as: UTF8.self)
 }
 
 /// Quote writes s as a JSON string literal, quotes included.
-public func Quote(_ s: string) -> string {
+public func Quote(s: string) -> string {
     var out: [uint8] = []
     writeString(s, &out)
     return String(decoding: out, as: UTF8.self)
 }
 
-func newline(_ out: inout [uint8], _ indent: [uint8], _ level: int) {
+func newline(out: inout [uint8], indent: [uint8], level: int) {
     if indent.isEmpty {
         return
     }
@@ -27,7 +27,7 @@ func newline(_ out: inout [uint8], _ indent: [uint8], _ level: int) {
     }
 }
 
-func write(_ v: Value, _ out: inout [uint8], _ indent: [uint8], _ level: int) {
+func write(v: Value, out: inout [uint8], indent: [uint8], level: int) {
     switch v {
     case .null:
         out.append(contentsOf: "null".utf8)
@@ -75,7 +75,7 @@ func write(_ v: Value, _ out: inout [uint8], _ indent: [uint8], _ level: int) {
 
 let hexDigits: [uint8] = [uint8]("0123456789abcdef".utf8)
 
-func writeString(_ s: string, _ out: inout [uint8]) {
+func writeString(s: string, out: inout [uint8]) {
     out.append(0x22)
     for c in s.utf8 {
         switch c {

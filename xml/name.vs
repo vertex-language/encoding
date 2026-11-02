@@ -13,7 +13,7 @@ public struct Name: Equatable {
     public var Space: string
     public var Local: string
 
-    public init(_ local: string, space: string = "") {
+    public init(local: string, space: string = "") {
         self.Space = space
         self.Local = local
     }
@@ -24,7 +24,7 @@ public struct Attr {
     public var Name: Name
     public var Value: string
 
-    public init(_ name: Name, _ value: string) {
+    public init(name: Name, value: string) {
         self.Name = name
         self.Value = value
     }

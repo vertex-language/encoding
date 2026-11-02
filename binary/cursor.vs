@@ -29,13 +29,13 @@ public struct Reader {
     /// One past the last byte this reader may consume.
     public var Limit: int
 
-    public init(_ data: [uint8]) {
+    public init(data: [uint8]) {
         self.Data = data
         self.Offset = 0
         self.Limit = data.count
     }
 
-    public init(_ data: [uint8], from: int, to: int) {
+    public init(data: [uint8], from: int, to: int) {
         self.Data = data
         self.Offset = from
         self.Limit = to
@@ -46,7 +46,7 @@ public struct Reader {
 
     public var AtEnd: bool { return Offset >= Limit }
 
-    func need(_ n: int) throws {
+    func need(n: int) throws {
         if n < 0 || Limit - Offset < n {
             throw BinaryError.short(want: n, have: Limit - Offset)
         }
@@ -122,7 +122,7 @@ public struct Reader {
     }
 
     /// Bytes copies the next n bytes out.
-    public mutating func Bytes(_ n: int) throws -> [uint8] {
+    public mutating func Bytes(n: int) throws -> [uint8] {
         try need(n)
         var out = [uint8](repeating: 0, count: n)
         var i = 0
@@ -146,14 +146,14 @@ public struct Reader {
         return out
     }
 
-    public mutating func Skip(_ n: int) throws {
+    public mutating func Skip(n: int) throws {
         try need(n)
         Offset += n
     }
 
     /// Sub is a reader over the next n bytes, which this reader skips.
     /// Nested structures read through a Sub cannot overrun their length.
-    public mutating func Sub(_ n: int) throws -> Reader {
+    public mutating func Sub(n: int) throws -> Reader {
         try need(n)
         let r = Reader(Data, from: Offset, to: Offset + n)
         Offset += n
@@ -182,63 +182,63 @@ public struct Writer {
 
     public var Count: int { return Bytes.count }
 
-    public mutating func U8(_ v: uint8) {
+    public mutating func U8(v: uint8) {
         Bytes.append(v)
     }
 
-    public mutating func U16LE(_ v: uint16) {
+    public mutating func U16LE(v: uint16) {
         Bytes.append(uint8(truncatingIfNeeded: v))
         Bytes.append(uint8(truncatingIfNeeded: v >> 8))
     }
 
-    public mutating func U16BE(_ v: uint16) {
+    public mutating func U16BE(v: uint16) {
         Bytes.append(uint8(truncatingIfNeeded: v >> 8))
         Bytes.append(uint8(truncatingIfNeeded: v))
     }
 
-    public mutating func U24BE(_ v: uint32) {
+    public mutating func U24BE(v: uint32) {
         Bytes.append(uint8(truncatingIfNeeded: v >> 16))
         Bytes.append(uint8(truncatingIfNeeded: v >> 8))
         Bytes.append(uint8(truncatingIfNeeded: v))
     }
 
-    public mutating func U32LE(_ v: uint32) {
+    public mutating func U32LE(v: uint32) {
         Bytes.append(uint8(truncatingIfNeeded: v))
         Bytes.append(uint8(truncatingIfNeeded: v >> 8))
         Bytes.append(uint8(truncatingIfNeeded: v >> 16))
         Bytes.append(uint8(truncatingIfNeeded: v >> 24))
     }
 
-    public mutating func U32BE(_ v: uint32) {
+    public mutating func U32BE(v: uint32) {
         Bytes.append(uint8(truncatingIfNeeded: v >> 24))
         Bytes.append(uint8(truncatingIfNeeded: v >> 16))
         Bytes.append(uint8(truncatingIfNeeded: v >> 8))
         Bytes.append(uint8(truncatingIfNeeded: v))
     }
 
-    public mutating func U64LE(_ v: uint64) {
+    public mutating func U64LE(v: uint64) {
         U32LE(uint32(truncatingIfNeeded: v))
         U32LE(uint32(truncatingIfNeeded: v >> 32))
     }
 
-    public mutating func U64BE(_ v: uint64) {
+    public mutating func U64BE(v: uint64) {
         U32BE(uint32(truncatingIfNeeded: v >> 32))
         U32BE(uint32(truncatingIfNeeded: v))
     }
 
-    public mutating func I16LE(_ v: int16) {
+    public mutating func I16LE(v: int16) {
         U16LE(uint16(bitPattern: v))
     }
 
-    public mutating func I32LE(_ v: int32) {
+    public mutating func I32LE(v: int32) {
         U32LE(uint32(bitPattern: v))
     }
 
-    public mutating func Append(_ b: [uint8]) {
+    public mutating func Append(b: [uint8]) {
         Bytes.append(contentsOf: b)
     }
 
-    public mutating func Zeros(_ n: int) {
+    public mutating func Zeros(n: int) {
         var i = 0
         while i < n {
             Bytes.append(0)
@@ -247,7 +247,7 @@ public struct Writer {
     }
 
     /// UTF16LE appends text as UTF-16LE, with a NUL terminator when asked.
-    public mutating func UTF16LE(_ s: string, terminate: bool = false) {
+    public mutating func UTF16LE(s: string, terminate: bool = false) {
         Bytes.append(contentsOf: EncodeUTF16LE(s))
         if terminate {
             Bytes.append(0)
@@ -257,17 +257,17 @@ public struct Writer {
 
     /// Patch16LE overwrites two bytes already written, for length fields
     /// that are only known once what follows them has been written.
-    public mutating func Patch16LE(at: int, _ v: uint16) {
+    public mutating func Patch16LE(at: int, v: uint16) {
         Bytes[at] = uint8(truncatingIfNeeded: v)
         Bytes[at + 1] = uint8(truncatingIfNeeded: v >> 8)
     }
 
-    public mutating func Patch16BE(at: int, _ v: uint16) {
+    public mutating func Patch16BE(at: int, v: uint16) {
         Bytes[at] = uint8(truncatingIfNeeded: v >> 8)
         Bytes[at + 1] = uint8(truncatingIfNeeded: v)
     }
 
-    public mutating func Patch32LE(at: int, _ v: uint32) {
+    public mutating func Patch32LE(at: int, v: uint32) {
         Bytes[at] = uint8(truncatingIfNeeded: v)
         Bytes[at + 1] = uint8(truncatingIfNeeded: v >> 8)
         Bytes[at + 2] = uint8(truncatingIfNeeded: v >> 16)
@@ -276,7 +276,7 @@ public struct Writer {
 }
 
 /// EncodeUTF16LE is the UTF-16LE encoding of s, without a terminator.
-public func EncodeUTF16LE(_ s: string) -> [uint8] {
+public func EncodeUTF16LE(s: string) -> [uint8] {
     let units = utf16.Encode(s)
     var out: [uint8] = []
     out.reserveCapacity(units.count * 2)
@@ -288,7 +288,7 @@ public func EncodeUTF16LE(_ s: string) -> [uint8] {
 }
 
 /// DecodeUTF16LE decodes UTF-16LE bytes, stopping at the first NUL unit.
-public func DecodeUTF16LE(_ b: [uint8]) -> string {
+public func DecodeUTF16LE(b: [uint8]) -> string {
     var units: [uint16] = []
     var i = 0
     while i + 1 < b.count {

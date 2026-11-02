@@ -15,7 +15,7 @@ public struct Block {
     }
 }
 
-func asciiText(_ bytes: [uint8], from: int, to: int) -> string {
+func asciiText(bytes: [uint8], from: int, to: int) -> string {
     var chars: [CChar] = []
     var i = from
     while i < to {
@@ -26,7 +26,7 @@ func asciiText(_ bytes: [uint8], from: int, to: int) -> string {
     return string(cString: chars)
 }
 
-func hasPrefix(_ bytes: [uint8], from: int, prefix: string) -> bool {
+func hasPrefix(bytes: [uint8], from: int, prefix: string) -> bool {
     var i = 0
     for b in prefix.utf8 {
         if from + i >= bytes.count || bytes[from + i] != b {
@@ -38,7 +38,7 @@ func hasPrefix(_ bytes: [uint8], from: int, prefix: string) -> bool {
 }
 
 /// Decode finds the next PEM formatted block in the input text.
-public func DecodeString(_ text: string) -> Block? {
+public func DecodeString(text: string) -> Block? {
     var bytes: [uint8] = []
     for b in text.utf8 {
         bytes.append(b)
@@ -47,7 +47,7 @@ public func DecodeString(_ text: string) -> Block? {
 }
 
 /// Decode finds the next PEM formatted block in the input byte slice.
-public func Decode(_ data: [uint8]) -> Block? {
+public func Decode(data: [uint8]) -> Block? {
     let beginMarker = "-----BEGIN "
     let endMarker = "-----END "
     let markerLen = 11
@@ -114,11 +114,11 @@ public func Decode(_ data: [uint8]) -> Block? {
 }
 
 /// Encode returns the PEM encoding of block.
-public func Encode(_ block: Block) -> string {
+public func Encode(block: Block) -> string {
     let b64 = base64.EncodeToString(block.Bytes)
     var out: [CChar] = []
 
-    func appendStr(_ s: string) {
+    func appendStr(s: string) {
         for b in s.utf8 {
             out.append(CChar(truncatingIfNeeded: b))
         }

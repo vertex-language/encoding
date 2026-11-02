@@ -17,7 +17,7 @@ public struct Encoding {
         self.alphabet = isURL ? urlAlphabet : stdAlphabet
     }
 
-    func charAt(_ idx: int) -> CChar {
+    func charAt(idx: int) -> CChar {
         var i = 0
         for b in alphabet.utf8 {
             if i == idx {
@@ -28,7 +28,7 @@ public struct Encoding {
         return 61 // '='
     }
 
-    func decodeChar(_ b: uint8) -> int32 {
+    func decodeChar(b: uint8) -> int32 {
         if b >= 65 && b <= 90 {   // 'A'-'Z'
             return int32(b - 65)
         }
@@ -48,7 +48,7 @@ public struct Encoding {
         return -1
     }
 
-    public func EncodeToString(_ src: [uint8]) -> string {
+    public func EncodeToString(src: [uint8]) -> string {
         var out: [CChar] = []
         let pad: CChar = 61 // '='
         var i = 0
@@ -89,7 +89,7 @@ public struct Encoding {
         return string(cString: out)
     }
 
-    public func DecodeString(_ s: string) throws -> [uint8] {
+    public func DecodeString(s: string) throws -> [uint8] {
         var raw: [uint8] = []
         for b in s.utf8 {
             // Ignore whitespace (CR, LF, space, tab)
@@ -160,10 +160,10 @@ public struct Encoding {
 public let StdEncoding = Encoding(isURL: false)
 public let URLEncoding = Encoding(isURL: true)
 
-public func EncodeToString(_ src: [uint8]) -> string {
+public func EncodeToString(src: [uint8]) -> string {
     return StdEncoding.EncodeToString(src)
 }
 
-public func DecodeString(_ s: string) throws -> [uint8] {
+public func DecodeString(s: string) throws -> [uint8] {
     return try StdEncoding.DecodeString(s)
 }
